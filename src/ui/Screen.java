@@ -46,17 +46,20 @@ public class Screen {
 	}
 
 	public void addButtons() {
-		button1 = new JButton("Path");
+		button1 = new JButton("Print");
 		button2 = new JButton("Move");
-		button3 = new JButton("End");
-		button4 = new JButton("Restart");
+		button3 = new JButton("Clear");
+		button4 = new JButton("Start");
 		button5 = new JButton("Save");
 		button6 = new JButton("Redo");
 		button7 = new JButton("Undo");
-		button8 = new JButton("Restore");
+		button8 = new JButton("Load");
 		controlPanel.add(button7);
+		controlPanel.add(button6);
 		controlPanel.add(button5);
 		controlPanel.add(button8);
+		//controlPanel.add(button1);
+		controlPanel.add(button3);
 		controlPanel.add(button4);
 
 	}
@@ -64,11 +67,10 @@ public class Screen {
 	public void addListeners() {
 		button1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				message = "You can now set the path of the movement.";
-				// JOptionPane.showMessageDialog(frame, message);
-				gameBoard.setMode(true, false, false, false);
+				gameBoard.printAllSteps();
 			}
 		});
+		/*
 		button2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				message = "You can now set the start position.";
@@ -77,14 +79,9 @@ public class Screen {
 				frame.repaint();
 			}
 		});
+		*/
 		button3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				message = "You can now set the end position.";
-				// JOptionPane.showMessageDialog(frame, message);
-				gameBoard.setMode(false, false, true, false);
-			}
-		});
-		button4.addActionListener(new ActionListener() {
+			//clear
 			public void actionPerformed(ActionEvent e) {
 				frame.remove(gameBoard);
 				frame.revalidate();
@@ -94,26 +91,35 @@ public class Screen {
 				frame.revalidate();
 				frame.repaint();
 				message = "Your game has been reset. You can now start playing again.";
-				// JOptionPane.showMessageDialog(frame, message);
 				gameBoard.setMode(true, false, false, false);
 			}
 		});
 		button5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				gameBoard.setMode(false, false, false, true);
+				//gameBoard.setMode(false, false, false, true);
 				showSaveFileDialog();
+				//gameBoard.save(gameBoard.boardArray);
 			}
 		});
 		button6.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
-				
-				
-				
+                /*
+				int index = gameBoard.getBoardStatesSize() - 1;
+				//continue here
+				if ((index + counter) < index) {
+					counter++;
+				}
+				gameBoard.returnBoard(index + counter);
+				frame.repaint();
+				System.out.println("index: " + (index + counter));
+				*/
 			}
+
 		});
 		button7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				//undo
 				
 				gameBoard.undo();
 				frame.repaint();
@@ -121,7 +127,7 @@ public class Screen {
 		});
 		button8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				loadFileDialog();
 			}
 		});
 	}
@@ -136,7 +142,7 @@ public class Screen {
 			System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 			try {
 				writeFileTo(fileToSave.getAbsoluteFile());
-				message = "Your design has been exported.";
+				message = "The board has been saved successfully.";
 				JOptionPane.showMessageDialog(frame, message);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -144,7 +150,43 @@ public class Screen {
 		}
 	}
 
+	public void loadFileDialog() {
+		/*
+		JFrame parentFrame = new JFrame();
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Select a board to load");
+		String string;
+		String[] stringArray = {};
+		boolean success = false;
+		int userSelection = fileChooser.showOpenDialog(parentFrame);
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+			try {
+				File fileSelected = fileChooser.getSelectedFile();
+				System.out.println(fileSelected.getName());
+				string = readFileFrom(fileSelected.getAbsolutePath());
+				stringArray = string.split("");
+				message = "The board has been loaded successfully.";
+				JOptionPane.showMessageDialog(frame, message);
+				success = true;
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (success) {
+			int[] list = new int[stringArray.length];
+			for (int i = 0; i < stringArray.length; i++) {
+				list[i] = Integer.parseInt(stringArray[i]);
+			}
+			int[][] board = gameBoard.listToArray(list);
+			gameBoard.boardArray = board.clone();
+			frame.repaint();
+		}
+		*/
+	}
+
 	public void writeFileTo(File output) throws IOException {
+
 		FileWriter fw = new FileWriter(output);
 		String string = gameBoard.toString();
 		fw.write(string);
