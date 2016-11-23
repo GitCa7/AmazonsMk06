@@ -2,11 +2,21 @@ package Game;
 
 import ui.GridCoordinate;
 
+import java.util.ArrayList;
+import java.util.concurrent.ForkJoinPool;
+
 public class Player {
 
 	GridCoordinate[] amazonPositions = new GridCoordinate[4];
 	private boolean isFirst;
+
+
+	//Bot relevant values
 	private boolean isBot;
+
+
+
+
 
 	public Player(boolean isFirst) {
 		this.isFirst = isFirst;
@@ -24,6 +34,10 @@ public class Player {
 		return isFirst;
 	}
 
+	public boolean isBot()	{
+		return isBot;
+	}
+
 	public void setFirst() {
 		isFirst = true;
 	}
@@ -31,6 +45,20 @@ public class Player {
 	public void setSecond() {
 		isFirst = false;
 	}
+
+	//Function Overload in Bot classes
+	public void nextMove(int[][] Grid, boolean isQueenMove, ArrayList<GridCoordinate> posMoves)	{
+
+	}
+
+	//Function Overload in Bot classes
+	public GridCoordinate nextMove()	{
+		return null;
+	}
+
+
+
+
 
 	public int getVal() {
 		if (isFirst) {

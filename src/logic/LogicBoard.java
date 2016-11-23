@@ -1,5 +1,6 @@
 package logic;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -24,13 +25,20 @@ public class LogicBoard {
 
 	public boolean queenSelect;
 	public boolean arrowSpotSelect;
-	
+
 	//private ArrayList<Move> Moves;
 	private ArrayList<tempBoard> Moves;
 	private int currentMoveIndex;
 	private ArrayList<int[][]> boardStates = new ArrayList<>();
 
 	private GridCoordinate origin;
+
+
+	private boolean debugTurnIssues = false;
+	private boolean debugHistory = true;
+	private boolean printBoards = true;
+
+
 
 
 	// According to sprite
@@ -57,8 +65,8 @@ public class LogicBoard {
 
 	}
 
-	
-	
+
+
 	public void printBoard() {
 		System.out.println("");
 		String s;
@@ -100,7 +108,9 @@ public class LogicBoard {
 			Grid[temp[i].y][temp[i].x] = bQueenVal /* + i */;
 		}
 		currentMoveIndex = -1;
-		//addMove();
+		addMove();
+
+		System.out.println("CURRENT INDEX: " + currentMoveIndex + "\nCurrent Player: " + getCurrent() + "\nqueenSelect: " + queenSelect + "\narrowSpotSelect: " + arrowSpotSelect + "\n");
 	}
 
 	public int[][] getBoard() {
@@ -114,27 +124,27 @@ public class LogicBoard {
 	}
 
 	public String getBoardAsString()    {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < Grid.length; i++)   {
-            for(int j = 0; j < Grid[0].length; j++) {
-                builder.append(Grid[i][j]);
-            }
-        }
-        return builder.toString();
-    }
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0; i < Grid.length; i++)   {
+			for(int j = 0; j < Grid[0].length; j++) {
+				builder.append(Grid[i][j]);
+			}
+		}
+		return builder.toString();
+	}
 
-    public int[][] listToArray(int[] list) {
-        int size = (int) Math.sqrt(list.length);
-        int[][] array = new int[size][size];
-        int k = 0;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                array[i][j] = list[k];
-                k++;
-            }
-        }
-        return array;
-    }
+	public int[][] listToArray(int[] list) {
+		int size = (int) Math.sqrt(list.length);
+		int[][] array = new int[size][size];
+		int k = 0;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				array[i][j] = list[k];
+				k++;
+			}
+		}
+		return array;
+	}
 
 
 	public int[] arrayToList(int[][] array) {
@@ -190,22 +200,22 @@ public class LogicBoard {
 			}
 		}
 	}
-	
+
 	public void setQueenOfCurrentOn(GridCoordinate point)	{
 		int x = point.x - 1;
 		int y = point.y - 1;
-		
+
 		Grid[y][x] = getCurrent().getVal();
 	}
-	
+
 	public void setQueenOfCurrentOn(int x, int y)	{
 		Grid[y][x] = getCurrent().getVal();
 	}
-	
+
 	public void setQueenOfOpposing(GridCoordinate point)	{
 		int x = point.x - 1;
 		int y = point.y - 1;
-		
+
 		if(current == player1)	{
 			Grid[y][x] = player2.getVal();
 		}
@@ -213,46 +223,64 @@ public class LogicBoard {
 			Grid[y][x] = player1.getVal();
 		}
 	}
-	
+
 	public void setArrowOn(int x, int y)	{
 		Grid[y][x] = arrowVal;
+		toggleTurn();
 	}
-	
+
 	public void setArrowOn(GridCoordinate position)	{
 		int x = position.x - 1;
 		int y = position.y - 1;
-		
+
 		Grid[y][x] = arrowVal;
 	}
 
 	public void setEmpty(GridCoordinate point)	{
 		int x = point.x - 1;
 		int y = point.y - 1;
-		
+
 		Grid[y][x] = 0;
 	}
-	
-	
+
+
 	public void addMove()	{
 		int[][] t = copyBoard();
 		tempBoard tBoard = new tempBoard(t);
-		Moves.add(tBoard);
+
+		System.out.println("AddMove:\nMoveIndex: " + currentMoveIndex + "\nSize: " + Moves.size());
+
+		if(Moves.size() - 1 == currentMoveIndex)
+			Moves.add(tBoard);
+		else	{
+			while(Moves.size() - 1 > currentMoveIndex)	{
+				Moves.remove(Moves.size() - 1);
+			}
+			Moves.add(tBoard);
+
+
+		}
+
+		printAllMoves();
+
 		System.out.println("Last State");
 		printBoard(Moves.get(Moves.size() - 1).getMomentaryBoard());
 		currentMoveIndex++;
+
+
 	}
-	
+
 	public int[][] copyBoard()	{
-		
+
 		int length = Grid.length;
-	    int[][] target = new int[length][Grid[0].length];
-	    for (int i = 0; i < length; i++) {
-	        System.arraycopy(Grid[i], 0, target[i], 0, Grid[i].length);
-	    }
-	    return target;
-		
+		int[][] target = new int[length][Grid[0].length];
+		for (int i = 0; i < length; i++) {
+			System.arraycopy(Grid[i], 0, target[i], 0, Grid[i].length);
+		}
+		return target;
+
 	}
-	
+
 	private void setBoard(int[][] newBoard)	{
 		for (int i = 0; i < Grid.length; i++) {
 			System.arraycopy(newBoard[i], 0, Grid[i], 0, newBoard[i].length);
@@ -295,79 +323,119 @@ public class LogicBoard {
 
 		}
 	}
-	
+
+
+	//SOMETHING DOES NOT WORK HERE
 	public void undoMove()	{
 
+		System.out.println("\nBefore Undo:\nCURRENT INDEX: " + currentMoveIndex + "\nSize: " + Moves.size() + "\nCurrent Player: " + getCurrent() + "\nqueenSelect: " + queenSelect + "\narrowSpotSelect: " + arrowSpotSelect + "\n");
 
-		//possible cases
-		//queen has been choose
-		System.out.println("queenSelect: " + queenSelect + "\narrowSpotSelect: " + arrowSpotSelect);
-		
-		if(!arrowSpotSelect && queenSelect)	{
+		/*
+		First case:			Queen has NOT been chosen for move
+			->	When goimg back possible go to previous state and allow opposite player to chose where to place Arrow
+
+		Second case:		Queen has been chosen for move but you wanna chosse a differnt queen
+			->	Remove possible options
+
+		Third case:			Queen has been placed and you are about to place the Arrow
+			->	Revert to previous state where queen was not yet moved
+
+		Fourth case:		Queen has been placed and you are about to place the Arrow
+			->	Revert to previous state where queen was not yet moved
+
+		 */
+
+		if(!arrowSpotSelect && !queenSelect)	{
+
+			if(Moves.size() > 1 && currentMoveIndex > 0)	{
+				--currentMoveIndex;
+				System.out.println("Index set to: " + currentMoveIndex);
+				tempBoard temp = Moves.get(currentMoveIndex);
+				int[][] temp2 = temp.getMomentaryBoard();
+
+				if(printBoards) {
+
+					System.out.println("Supposingly new state");
+					printBoard(temp2);
+				}
+
+				setBoard(temp2);
+
+				toggleTurn();
+
+				arrowSpotSelect = true;
+				queenSelect =  false;
+
+
+			}
+		}
+		else if(!arrowSpotSelect && queenSelect)	{
 			removePossibleMoves();
 			queenSelect = false;
 		}
 		else if(arrowSpotSelect && !queenSelect)	{
-		//You are about to place an Arrow but are unhappy with the Position of the Queen so you choose the previous situation
-			if(Moves.size() > 0 && currentMoveIndex > 0 && currentMoveIndex < Moves.size())	{
-				System.out.println("entered");
-				//int lastPos = Moves.size() - 1;
+			if(Moves.size() > 0 && currentMoveIndex > 0)	{
+				System.out.println("Entered");
+				--currentMoveIndex;
+				System.out.println("Index set to: " + currentMoveIndex);
 				tempBoard temp = Moves.get(currentMoveIndex);
+				int[][] temp2 = temp.getMomentaryBoard();
 
-				if(temp.getOrigin() != null)	{
-					origin = temp.getOrigin();
+
+
+				/*
+				if(printBoards) {
+					System.out.println("Temp:");
+					temp.print();
+					System.out.println("Supposingly new state");
+					printBoard(temp2);
 				}
+				*/
 
-				int[][] temp2 = temp.getMomentaryBoard();
-				System.out.println("Supposingly new state");
-				printBoard(temp2);
-				Grid = temp2;
-				queenSelect = false;
+				setBoard(temp2);
+
+
 				arrowSpotSelect = false;
-
-
-
-				currentMoveIndex--;
-			}
-			
-		}
-		else if(!arrowSpotSelect && !queenSelect)	{
-			if(Moves.size() > 0 && currentMoveIndex > 0 && currentMoveIndex < Moves.size())	{
-				int lastPos = Moves.size() - 1;
-				tempBoard temp = Moves.get(currentMoveIndex);
-				int[][] temp2 = temp.getMomentaryBoard();
-				System.out.println("Supposingly new state");
-				printBoard(temp2);
-				Grid = temp2;
-				arrowSpotSelect = true;
 				queenSelect =  false;
 			}
 		}
 		else	{
-			//When you just want to get the previous state
-			System.out.println("Size: " + Moves.size());
-			if(Moves.size() > 0 && currentMoveIndex > 0 && currentMoveIndex < Moves.size())	{
-				int lastPos = Moves.size() - 1;
-				tempBoard temp = Moves.get(currentMoveIndex);
+			if(Moves.size() > 0 && currentMoveIndex > 0) {
+				tempBoard temp = Moves.get(--currentMoveIndex);
 				int[][] temp2 = temp.getMomentaryBoard();
-				System.out.println("Supposingly new state");
-				printBoard(temp2);
-				Grid = temp2;
-				toggleTurn();
 
-				//Not sure if this should be here
-				currentMoveIndex--;
+				if (printBoards) {
+					System.out.println("Temp:");
+					temp.print();
+					System.out.println("Supposingly new state");
+					printBoard(temp2);
+				}
+
+				setBoard(temp2);
+
+				if(currentMoveIndex > 1)
+					toggleTurn();
 			}
 		}
-		System.out.println("Actual Grid");
-		printBoard();
-		
+
+		if(currentMoveIndex < -1)
+			currentMoveIndex = -1;
+
+
+
+		System.out.println("\nAfter Undo:\nCURRENT INDEX: " + currentMoveIndex + "\nCurrent Player: " + getCurrent() + "\nqueenSelect: " + queenSelect + "\narrowSpotSelect: " + arrowSpotSelect + "\n");
+
+		if(printBoards) {
+			System.out.println("Actual Grid");
+			printBoard();
+		}
+
 	}
-	
+
 	public void setEmpty(int x, int y)	{
 		Grid[y][x] = 0;
 	}
-	
+
 	// Checks whether the game is over (i.e. is every queen from a certain
 	// player locked in? if yes, then game over)
 	public boolean isGameOver() {
@@ -382,52 +450,54 @@ public class LogicBoard {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
-	
-	
+
+
 	public void printBoard(int[][] array) {
-        String s;
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[0].length; j++) {
-                if (array[i][j] < 10) {
-                    s = "";
-                } else {
-                    s = "0";
-                }
-                System.out.print(s + array[i][j] + " ");
-            }
-            System.out.println("");
-        }
-    }
-	
-	
+		String s;
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				if (array[i][j] < 10) {
+					s = "";
+				} else {
+					s = "0";
+				}
+				System.out.print(s + array[i][j] + " ");
+			}
+			System.out.println("");
+		}
+	}
+
+   
+
+
 
 	// Checks if a queens move is possible and takes board boundaries into
 	// account to prevent out of boundary issues
 	public void calcPosMoves(GridCoordinate position, boolean amazonMove) {
 		origin = position;
 		removePossibleMoves();
-		
+
 		//Since GridCordinates start at 1,1 instead of 0,0
 		int x = position.x - 1;
 		int y = position.y - 1;
 
-		
-		System.out.println("Position: X = " + x + " Y= " + y);
-		
-		
+
+		//System.out.println("Position: X = " + x + " Y= " + y);
+
+
 		int val;
-		
+
 		if(amazonMove)	{
 			val = amazonPosVal;
 		}
 		else	{
 			val = arrowPosVal;
 		}
-		
+
 		int i, j;
 		int tempX, tempY;
 		int length = Grid.length;
@@ -501,11 +571,11 @@ public class LogicBoard {
 
 		}
 
-		
-		
+
+
 	}
-	
-	
+
+
 	public boolean isMovePossible()	{
 		int posMoves = countPosMoves();
 		if (posMoves == 0) {
@@ -516,7 +586,7 @@ public class LogicBoard {
 			return true;
 		}
 	}
-	
+
 	private int countPosMoves()	{
 		int count = 0;
 		for(int i = 0; i < Grid.length; i++)	{
@@ -528,7 +598,7 @@ public class LogicBoard {
 		}
 		return count;
 	}
-	
+
 	public ArrayList<GridCoordinate> listQueensOfCurrent()	{
 		ArrayList<GridCoordinate> queens = new ArrayList<GridCoordinate>();
 		int pos=0;
@@ -546,7 +616,7 @@ public class LogicBoard {
 		}
 		return queens;
 	}
-	
+
 	public ArrayList<GridCoordinate> listPossibleMoves(GridCoordinate position)	{
 		ArrayList<GridCoordinate> posMoves = new ArrayList<GridCoordinate>();
 		calcPosMoves(position, false);
@@ -561,12 +631,12 @@ public class LogicBoard {
 		}
 		removePossibleMoves();
 		return posMoves;
-		
+
 	}
 
 	// Calculates possible moves and takes board boundaries into account to
 	// prevent out of boundary issues.
-	
+
 
 	private boolean checkBound(int y, int x) {
 		if ((y >= 0 && y < Grid.length) && (x >= 0 && x < Grid[0].length)) {
@@ -586,25 +656,30 @@ public class LogicBoard {
 			return false;
 		}
 	}
-	
+
 	public void toggleTurn() {
 		queenSelect = false;
 		arrowSpotSelect = false;
 		//Change to true
-		System.out.print("Turn ended: ");
+		if(debugTurnIssues)
+			System.out.print("Turn ended: ");
 		if (current == player1) {
-			System.out.print("player 2 turn now\n");
+
+			if(debugTurnIssues)
+				System.out.print("player 2 turn now\n");
 			current = player2;
 		} else {
-			System.out.print("player 1 turn now\n");
+
+			if(debugTurnIssues)
+				System.out.print("player 1 turn now\n");
 			current = player1;
 		}
 	}
-	
+
 	public Player getCurrent()	{
 		return current;
 	}
-	
+
 	public boolean posMovesDispl()	{
 		for(int i = 0; i < Grid.length; i++)	{
 			for(int j = 0; j < Grid[0].length; j++)	{
@@ -615,28 +690,66 @@ public class LogicBoard {
 		}
 		return false;
 	}
-	
+
 	public boolean amazonOfCurrentPlayer(GridCoordinate position) {
+		return amazonOfCurrentPlayer(position, getCurrent());
+	}
+
+	public boolean amazonOfCurrentPlayer(GridCoordinate position, Player inQuestion) {
 		int posX = position.x - 1;
 		int posY = position.y - 1;
-		
-		
-		if (Grid[posY][posX] == current.getVal()) {
+
+
+		if (Grid[posY][posX] == inQuestion.getVal()) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
+
 	public boolean posMoveAt(GridCoordinate position){
 		int posX = position.x - 1;
 		int posY = position.y - 1;
-		
+
 		if (Grid[posY][posX] == amazonPosVal || Grid[posY][posX] == arrowPosVal) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+
+	public boolean checkGameOverForCurrent()	{
+		return isGameOver(current);
+	}
+
+	//rudimentary gameOver Checker
+	public boolean isGameOver(Player inQuestion)	{
+
+		ArrayList<GridCoordinate> queenPositions = new ArrayList();
+
+		//First get Positons of all Queens
+		for(int i = 0; i < 11; i++)	{
+			for(int j = 0; j < 11; j++)	{
+				if(amazonOfCurrentPlayer(new GridCoordinate(i,j), inQuestion)){
+					queenPositions.add(new GridCoordinate(i,j));
+				}
+				if(queenPositions.size() == 4)
+					break;
+			}
+		}
+
+		//Second, evalueate for every Quuen whether it can still move
+		for(GridCoordinate pos : queenPositions)	{
+			posMoveAt(pos);
+			if(countPosMoves() > 0)
+				return false;
+		}
+
+		return true;
+
+
+	}
+
 
 }

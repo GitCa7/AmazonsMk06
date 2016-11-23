@@ -26,65 +26,65 @@ import logic.LogicBoard;
 
 public class GameBoard extends JPanel implements MouseMotionListener, MouseListener, ActionListener {
 
-	private final Color GREEN = new Color(126, 211, 33, 255);
-	private final Color BLACK = new Color(0, 0, 0, 255);
-	private final Color RED = new Color(254, 0, 0, 255);
-	private Color color;
-	private Color even = new Color(209, 140, 72, 255);
-	private Color odd = new Color(255, 207, 159, 255);
-	private Shape square;
-	private int xCor, yCor;
-	private int counter;
+    private final Color GREEN = new Color(126, 211, 33, 255);
+    private final Color BLACK = new Color(0, 0, 0, 255);
+    private final Color RED = new Color(254, 0, 0, 255);
+    private Color color;
+    private Color even = new Color(209, 140, 72, 255);
+    private Color odd = new Color(255, 207, 159, 255);
+    private Shape square;
+    private int xCor, yCor;
+    private int counter;
 
-	private int gridXCor, gridYCor;
-	private GridCoordinate currentCoord;
+    private int gridXCor, gridYCor;
+    private GridCoordinate currentCoord;
 
-	private int currentPiece;
-	private Timer timer;
-	public LogicBoard logicBoard;
-	private boolean setPath = false, setStart = false, setEnd = false, startAnimation = false;
-	private boolean entersBoard = false;
-	private boolean updateNeeded;
-	private boolean DEBUG = false;
-	public Image[] piece, letter, figure;
-	public int x, y, dx, dy, speed, delay = 1000 / 60;
-	public int sizeX, sizeY;
+    private int currentPiece;
+    private Timer timer;
+    public LogicBoard logicBoard;
+    private boolean setPath = false, setStart = false, setEnd = false, startAnimation = false;
+    private boolean entersBoard = false;
+    private boolean updateNeeded;
+    private boolean DEBUG = false;
+    public Image[] piece, letter, figure;
+    public int x, y, dx, dy, speed, delay = 1000 / 60;
+    public int sizeX, sizeY;
 
-	public int width;
-	public int height;
-	public int[][] boardArray, tempArray;
-	private GridCoordinate arrowPoint = new GridCoordinate(0,0);
+    public int width;
+    public int height;
+    public int[][] boardArray, tempArray;
+    private GridCoordinate arrowPoint = new GridCoordinate(0,0);
 
-	ArrayList<Shape> cells = new ArrayList();
-	ArrayList<Shape> marker = new ArrayList<>();
-	ArrayList<Integer> pieces = new ArrayList<>();
-	ArrayList<GridCoordinate> markerCoordinates = new ArrayList();
-	ArrayList<GridCoordinate> pieceCoordinates = new ArrayList<>();
+    ArrayList<Shape> cells = new ArrayList();
+    ArrayList<Shape> marker = new ArrayList<>();
+    ArrayList<Integer> pieces = new ArrayList<>();
+    ArrayList<GridCoordinate> markerCoordinates = new ArrayList();
+    ArrayList<GridCoordinate> pieceCoordinates = new ArrayList<>();
 
     // Constructor
     public GameBoard(int sizeX, int sizeY, int gridX, int gridY) {
-    	this.sizeX = sizeX;
-		this.sizeY = sizeY;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
 
-		width = sizeX / gridX;
-		height = sizeY / gridY;
-		System.out.println("width: " + width + ", height: " + height);
-		setSize(sizeX, sizeY);
-		setBackground(Color.lightGray);
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		timer = new Timer(delay, this);
-		System.out.println("New timer");
+        width = sizeX / gridX;
+        height = sizeY / gridY;
+        System.out.println("width: " + width + ", height: " + height);
+        setSize(sizeX, sizeY);
+        setBackground(Color.lightGray);
+        addMouseListener(this);
+        addMouseMotionListener(this);
+        timer = new Timer(delay, this);
+        System.out.println("New timer");
 
-		Player player1 = new Player(true);
-		Player player2 = new Player(false);
+        Player player1 = new Player(true);
+        Player player2 = new Player(false);
 
-		logicBoard = new LogicBoard(player1, player2);
-		boardArray = logicBoard.getBoard();
-		System.out.println("\nInitial board:");
-		//logicBoard.printBoard(boardArray);
-		// logicBoard.calculateQueenDirections(7,10);
-		counter = 1;
+        logicBoard = new LogicBoard(player1, player2);
+        boardArray = logicBoard.getBoard();
+        System.out.println("\nInitial board:");
+        //logicBoard.printBoard(boardArray);
+        // logicBoard.calculateQueenDirections(7,10);
+        counter = 1;
     }
 
     // Sets the mode
@@ -169,7 +169,7 @@ public class GameBoard extends JPanel implements MouseMotionListener, MouseListe
         dy = yEnd - yStart;
         //logicBoard.printBoard(boardArray);
         timer.start();
-       //System.out.println("Animation started");
+        //System.out.println("Animation started");
         repaint();
         if (x <= 3) {
             speed = 3;
@@ -235,66 +235,78 @@ public class GameBoard extends JPanel implements MouseMotionListener, MouseListe
     public void cycle(int xEnd, int yEnd) {
         timer.stop();
         startAnimation = false;
-        System.out.println("Animation: false");
-        
+        //System.out.println("Animation: false");
+
+
+
         if(!logicBoard.arrowSpotSelect && logicBoard.queenSelect)	{
-        	System.out.println("ENTERED: Choosing Queen");
-        	currentPiece = logicBoard.getCurrent().getVal();
+            //System.out.println("ENTERED: Choosing Queen");
+            currentPiece = logicBoard.getCurrent().getVal();
             logicBoard.arrowSpotSelect = true;
             logicBoard.queenSelect = false;
         }
         else if(logicBoard.arrowSpotSelect){
-        	System.out.println("ENTERED: Choosing Arrow");
-        	currentPiece = logicBoard.arrowVal;
+            //System.out.println("ENTERED: Choosing Arrow");
+            currentPiece = logicBoard.arrowVal;
         }
-        
-        
-        System.out.println("Currentpiece: " + currentPiece);
+
+
+        //System.out.println("Currentpiece: " + currentPiece);
         updateBoard(yEnd - 1, xEnd - 1, currentPiece);
-        
+
     }
+
+
 
     // Updates the movement of the current board piece and calculates possible arrow moves when needed
     public void updateBoard(int row, int column, int value) {
-    	System.out.println("Value: " + value);
-    	if(value == 3)	{
-    		logicBoard.setArrowOn(column, row);
-    		
-    		logicBoard.removePossibleMoves();
-    		logicBoard.printAllMoves();
-    		//logicBoard.printBoard();
-    		logicBoard.toggleTurn();
-    		//logicBoard.queenSelect = false;
-        	//logicBoard.arrowSpotSelect = false;  
-    	}
-    	else	{
-    		logicBoard.setQueenOfCurrentOn(column, row);
+        //System.out.println("Value: " + value);
+        if(value == 3)	{
+
+
+
+            logicBoard.setArrowOn(column, row);
+
+            logicBoard.removePossibleMoves();
+            logicBoard.addMove();
+            //logicBoard.printAllMoves();
+            //logicBoard.printBoard();
+            //logicBoard.queenSelect = false;
+            //logicBoard.arrowSpotSelect = false;
+        }
+        else	{
+
+            logicBoard.setQueenOfCurrentOn(column, row);
+
+
         }
         boardArray = logicBoard.getBoard();
-        System.out.println("Board looks like:");
+        //System.out.println("Board looks like:");
         //logicBoard.printBoard(boardArray);
         marker.clear();
         markerCoordinates.clear();
-        System.out.println("Markers clear");
+
+        //System.out.println("Markers clear");
         GridCoordinate point = new GridCoordinate(column + 1, row + 1);
 
         markerCoordinates.add(point);
 
 
 
-        System.out.println("Marker added | (x,y) = " + point.x + "," + point.y);
+        //System.out.println("Marker added | (x,y) = " + point.x + "," + point.y);
         logicBoard.removePossibleMoves();
         boardArray = logicBoard.getBoard();
-        System.out.println("\nRemoved possible moves:");
+        //System.out.println("\nRemoved possible moves:");
         //logicBoard.printBoard(boardArray);
         if (updateNeeded) {
             logicBoard.calcPosMoves(point, false);
+            logicBoard.addMove();
             boardArray = logicBoard.getBoard();
-            System.out.println("Board updated:");
+            //System.out.println("Board updated:");
             //logicBoard.printBoard(boardArray);
             marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
         }
-        
+
         counter++;
     }
 
@@ -321,12 +333,12 @@ public class GameBoard extends JPanel implements MouseMotionListener, MouseListe
 
             boardArray = logicBoard.getBoard();
             System.out.println("new current");
-            logicBoard.printBoard();
+            //logicBoard.printBoard();
         }
 
 
 
-        
+
 
     }
 
@@ -405,76 +417,76 @@ public class GameBoard extends JPanel implements MouseMotionListener, MouseListe
         xCor = e.getX();
         yCor = e.getY();
 
-        if(!startAnimation)		{
+        //only executed when Animation is done and current player isn´t a bot
+        if(!startAnimation && !logicBoard.getCurrent().isBot())		{
 
 
 
-	        if(!logicBoard.arrowSpotSelect && !logicBoard.queenSelect)	{
-	        	GridCoordinate currentPoint = new GridCoordinate(gridXCor, gridYCor);
-	        	if(logicBoard.amazonOfCurrentPlayer(currentPoint)){
-	        		System.out.println("Select queen of Player: " + logicBoard.getCurrent());
-	        		
-	        		logicBoard.calcPosMoves(currentPoint, true);
-	        		
-	                if (logicBoard.isMovePossible()) {
-	                    System.out.println("Gridx =  " + gridXCor + " Y = " + gridYCor);
-	                    GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
-	                	marker.clear();
+            if(!logicBoard.arrowSpotSelect && !logicBoard.queenSelect)	{
+                GridCoordinate currentPoint = new GridCoordinate(gridXCor, gridYCor);
+                if(logicBoard.amazonOfCurrentPlayer(currentPoint)){
+                    System.out.println("Select queen of Player: " + logicBoard.getCurrent());
 
-	                    markerCoordinates.clear();
-	                    currentPiece = logicBoard.getCurrent().getVal();
-	                    System.out.println("Point: " + point);
-	                    marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
-	                    markerCoordinates.add(point);
-	                    
-	                    //logicBoard.calculatePossibleMoves(boardArray, point.x, point.y, 4);
-	                    x = gridXCor * width;
-	                    y = gridYCor * height;
-	                    
-	                    updateNeeded = true;
-	                    logicBoard.queenSelect = true;
-	                }
-	            }
-	        }
-	        else if (!logicBoard.arrowSpotSelect && logicBoard.queenSelect) {
-	        	
-	        	GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
-	        	
-	        	if(!logicBoard.amazonOfCurrentPlayer(point) && logicBoard.posMoveAt(point))	{
+                    logicBoard.calcPosMoves(currentPoint, true);
+
+                    if (logicBoard.isMovePossible()) {
+                        //System.out.println("Gridx =  " + gridXCor + " Y = " + gridYCor);
+                        GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
+                        marker.clear();
+
+                        markerCoordinates.clear();
+                        currentPiece = logicBoard.getCurrent().getVal();
+                        //System.out.println("Point: " + point);
+                        marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
+                        markerCoordinates.add(point);
+
+                        //logicBoard.calculatePossibleMoves(boardArray, point.x, point.y, 4);
+                        x = gridXCor * width;
+                        y = gridYCor * height;
+
+                        updateNeeded = true;
+                        logicBoard.queenSelect = true;
+                    }
+                }
+            }
+            else if (!logicBoard.arrowSpotSelect && logicBoard.queenSelect) {
+
+                GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
+
+                if(!logicBoard.amazonOfCurrentPlayer(point) && logicBoard.posMoveAt(point))	{
                     logicBoard.removePossibleMoves();
-	        		logicBoard.addMove();
-	                System.out.println("Select possible queen spot - Player 1 (white)");
-	                System.out.println("Point: " + point);
-	                marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
-	                markerCoordinates.add(point);
-	                //System.out.println("\nQueen move: (" + markerCoordinates.get(0).x + "," + markerCoordinates.get(0).y + ") -> (" + markerCoordinates.get(1).x + "," + markerCoordinates.get(1).y + ")");
-	                startAnimation = true;
+
+                    System.out.println("Select possible queen spot for Player: " + logicBoard.getCurrent());
+                    System.out.println("Point: " + point);
+                    marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
+                    markerCoordinates.add(point);
+                    //System.out.println("\nQueen move: (" + markerCoordinates.get(0).x + "," + markerCoordinates.get(0).y + ") -> (" + markerCoordinates.get(1).x + "," + markerCoordinates.get(1).y + ")");
+                    startAnimation = true;
 
 
-	                //boardArray[markerCoordinates.get(0).y - 1][markerCoordinates.get(0).x - 1] = 0;
-	                logicBoard.setEmpty(markerCoordinates.get(0));
-	                boardArray = logicBoard.getBoard();
-	                System.out.println("\nIntermediate board:");
-	                //logicBoard.printBoard(boardArray);
-	                arrowPoint = point;
-	            }
-	        	else if(logicBoard.amazonOfCurrentPlayer(point) && !logicBoard.posMoveAt(point))	{
-	        		//Check in with roger
-	        		logicBoard.queenSelect = false;
-	        		
-	        	}
-	        }
-	        else if (logicBoard.arrowSpotSelect && !logicBoard.queenSelect) {
-	        	System.out.println("Select possible arrow spot - Player 1 (white)");
+                    //boardArray[markerCoordinates.get(0).y - 1][markerCoordinates.get(0).x - 1] = 0;
+                    logicBoard.setEmpty(markerCoordinates.get(0));
+                    boardArray = logicBoard.getBoard();
+                    System.out.println("\nIntermediate board:");
+                    //logicBoard.printBoard(boardArray);
+                    arrowPoint = point;
+                }
+                else if(logicBoard.amazonOfCurrentPlayer(point) && !logicBoard.posMoveAt(point))	{
+                    //Check in with roger
+                    logicBoard.queenSelect = false;
 
-	        	GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
-	        	if (logicBoard.posMoveAt(point)) {
+                }
+            }
+            else if (logicBoard.arrowSpotSelect && !logicBoard.queenSelect) {
+                System.out.println("Select possible arrow spot - Player 1 (white)");
 
-                    logicBoard.addMove();
-	                currentPiece = logicBoard.arrowVal;
-                    System.out.println("Origin: " + markerCoordinates.get(0));
-	                marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
-	                markerCoordinates.add(point);
+                GridCoordinate point = new GridCoordinate(gridXCor, gridYCor);
+                if (logicBoard.posMoveAt(point)) {
+
+                    currentPiece = logicBoard.arrowVal;
+                    //System.out.println("Origin: " + markerCoordinates.get(0));
+                    marker.add(new Rectangle2D.Double(gridXCor * width + 2, gridYCor * height + 2, width - 4, height - 4));
+                    markerCoordinates.add(point);
 
                     int i = 0;
                     while(i < markerCoordinates.size()) {
@@ -482,36 +494,37 @@ public class GameBoard extends JPanel implements MouseMotionListener, MouseListe
                         i++;
                     }
 
-	                System.out.println("\nArrow move: (" + markerCoordinates.get(0).x + "," + markerCoordinates.get(0).y + ") -> (" + markerCoordinates.get(1).x + "," + markerCoordinates.get(1).y + ")");
+                    //System.out.println("\nArrow move: (" + markerCoordinates.get(0).x + "," + markerCoordinates.get(0).y + ") -> (" + markerCoordinates.get(1).x + "," + markerCoordinates.get(1).y + ")");
                     //System.out.println("Origin: " + markerCoordinates.get(0) + "\tDest: " + markerCoordinates.get(1));
 
 
                     updateNeeded = false; startAnimation = true;
                     int j = 0;
                     while(j < markerCoordinates.size()) {
-                        System.out.println("Number " + j + ": " + markerCoordinates.get(j));
+                        //System.out.println("Number " + j + ": " + markerCoordinates.get(j));
                         j++;
                     }
-	                    
-	            }
-	        	 else	{
-	             	System.out.println("Invalid Position");
-	             }
-	        }
-	       
-        
+
+                }
+                else	{
+                    //System.out.println("Invalid Position");
+                }
+            }
+
+
 
         }
-  
-        System.out.println("\nAnimation: " + startAnimation);
+
+
+        //System.out.println("\nAnimation: " + startAnimation);
         System.out.println("QueenSelect: " + logicBoard.queenSelect);
         System.out.println("ArrowSelect: " + logicBoard.arrowSpotSelect + "\n");
 
         repaint();
-    }	
+    }
 
-    
-    
+
+
 
 
     // Check selected piece with the logical board

@@ -17,6 +17,8 @@ public class tempBoard {
 		this.origin = origin;
 	}
 
+
+
 	public GridCoordinate getOrigin()	{
 		return origin;
 	}
@@ -33,6 +35,7 @@ public class tempBoard {
 
 	public void print()	{
 		String s;
+		System.out.println("\n");
 		for (int i = 0; i < momentaryBoard.length; i++) {
 			for (int j = 0; j < momentaryBoard[0].length; j++) {
 				if (momentaryBoard[i][j] < 10) {
@@ -49,13 +52,12 @@ public class tempBoard {
 
 	public boolean isSame(tempBoard comp)	{
 		int[][] mine = getMomentaryBoard();
-		int[][] toCompareTo = comp.getMomentaryBoard();
+		int[][] compare = comp.getMomentaryBoard();
 
-		for(int i = 0; i < toCompareTo.length; i++)	{
-			for(int j = 0; j < toCompareTo[0].length; j++)	{
-				if(mine[i][j] != toCompareTo[i][j])	{
+		for(int i = 0; i < mine.length && mine.length == compare.length; i++)	{
+			for(int j = 0; j < mine[0].length && mine[0].length == compare[0].length; j++)	{
+				if(mine[i][j] != compare[i][j])
 					return false;
-				}
 			}
 		}
 		return true;
